@@ -81,7 +81,7 @@ export default function AuthAuthNavigationBar() {
                 <SheetClose asChild>
                   <Button
                     asChild
-                    variant={isActive('/login') ? 'default' : 'outline'}
+                    variant={isActive('/login') ? 'default' : 'ghost'}
                     className={isActive('/login') ? 'border-primary bg-primary/10 text-primary hover:bg-primary/20' : ''}
                   >
                     <Link href={route('login')}>Sign In</Link>
@@ -131,12 +131,12 @@ export default function AuthAuthNavigationBar() {
         <div className="hidden items-center gap-4 lg:flex">
           <Button
             asChild
-            variant={isActive('/login') ? 'default' : 'outline'}
+            variant={isActive('/login') ? 'default' : 'ghost'}
             className={isActive('/login') ? 'border-primary bg-primary/10 text-primary hover:bg-primary/20' : ''}
           >
             <Link href={route('login')}>Sign In</Link>
           </Button>
-          <Button asChild variant={isActive('/register') ? 'secondary' : 'default'} className={isActive('/register') ? 'border-primary' : ''}>
+          <Button asChild className={isActive('/register') ? 'border-primary' : ''}>
             <Link href={route('register')}>Sign Up</Link>
           </Button>
         </div>
