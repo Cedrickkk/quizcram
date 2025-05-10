@@ -9,7 +9,6 @@ import { Sheet, SheetClose, SheetContent, SheetDescription, SheetHeader, SheetTi
 export default function AuthAuthNavigationBar() {
   const [isOpen, setIsOpen] = useState(false);
   const { url } = usePage();
-  console.log(url);
 
   const isActive = (path: string) => {
     return url.startsWith(path);
