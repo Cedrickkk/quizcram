@@ -1,7 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { Head } from '@inertiajs/react';
 import { ArrowRightLeft, BarChart3, Book, Clock, Cog, Share2 } from 'lucide-react';
-import AuthNavigationBar from './auth/navigation-bar';
+import AuthNavigationBar from './navigation-bar';
 
 // Updated quiz-focused features
 const quizFeatures = [

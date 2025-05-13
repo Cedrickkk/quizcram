@@ -17,14 +17,12 @@ export default function AuthAuthNavigationBar() {
   return (
     <header className="relative w-full bg-white shadow-sm">
       <div className="container mx-auto flex items-center justify-between p-4">
-        {/* Logo - Always visible */}
         <div className="flex items-center">
           <Link href={route('home')} className="text-primary text-xl font-bold">
             QuizCram
           </Link>
         </div>
 
-        {/* Hamburger Menu with Sheet - Only on small screens */}
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
           <SheetTrigger asChild className="lg:hidden">
             <button className="flex items-center rounded p-1 transition-all duration-300" aria-label="Open Menu">
@@ -41,7 +39,6 @@ export default function AuthAuthNavigationBar() {
             </SheetHeader>
 
             <div className="mt-8 flex flex-col justify-center space-y-4 text-center">
-              {/* Navigation Links */}
               <SheetClose asChild>
                 <Link
                   href={route('about')}
@@ -75,8 +72,6 @@ export default function AuthAuthNavigationBar() {
                 </Link>
               </SheetClose>
 
-              {/* Authentication Links */}
-              {/* Authentication Links in mobile menu */}
               <div className="border-border mt-6 flex w-full flex-col gap-3 space-y-3 border-t pt-6">
                 <SheetClose asChild>
                   <Button
@@ -97,7 +92,6 @@ export default function AuthAuthNavigationBar() {
           </SheetContent>
         </Sheet>
 
-        {/* Desktop Navigation - Only visible on large screens */}
         <div className="hidden items-center justify-between lg:flex lg:w-auto lg:space-x-6">
           <nav className="flex items-center space-x-6">
             <Link
@@ -127,7 +121,6 @@ export default function AuthAuthNavigationBar() {
           </nav>
         </div>
 
-        {/* Authentication Links - Hidden on small screens */}
         <div className="hidden items-center gap-4 lg:flex">
           <Button
             asChild
