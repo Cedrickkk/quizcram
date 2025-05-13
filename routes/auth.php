@@ -9,7 +9,6 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
-use Inertia\Inertia;
 
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
@@ -33,14 +32,6 @@ Route::middleware('guest')->group(function () {
 
     Route::post('reset-password', [NewPasswordController::class, 'store'])
         ->name('password.store');
-
-    Route::get('/', fn() => Inertia::render('welcome'))->name('home');
-
-    Route::get('/how-it-works', fn() => Inertia::render('how-it-works'))->name('how-it-works');
-
-    Route::get('/about', fn() => Inertia::render('about'))->name('about');
-
-    Route::get('/features', fn() => Inertia::render('features'))->name('features');
 });
 
 Route::middleware('auth')->group(function () {
