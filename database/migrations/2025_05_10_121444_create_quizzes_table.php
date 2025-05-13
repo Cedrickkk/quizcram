@@ -45,7 +45,7 @@ return new class extends Migration
             $table->enum('type', ['multiple_choice', 'true_or_false', 'short_answer'])->nullable(false);
             $table->unsignedInteger('points')->nullable(false)->default(1);
             $table->unsignedInteger('order_number')->nullable(false);
-            $table->string('image');
+            $table->string('image')->nullable();
             $table->timestamps();
         });
 
