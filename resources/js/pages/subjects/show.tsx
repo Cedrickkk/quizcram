@@ -7,6 +7,7 @@ import { type BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
 import { Activity, BookOpen, Clock, Coins, FileText, PlusCircle, Star } from 'lucide-react';
 import { useState } from 'react';
+import CreateQuizTitleDialog from '../quizzes/create-quiz-title-dialog';
 
 interface Quiz {
   id: number;
@@ -35,8 +36,7 @@ export default function Show() {
   const { subject } = usePage<{ subject: Subject }>().props;
   const [activeTab, setActiveTab] = useState('details');
   const [favorited, setFavorited] = useState(false);
-
-  console.log(subject);
+  const [showCreateQuizTitleDialog, setShowCreateQuizTitleDialog] = useState(false);
 
   const breadcrumbs: BreadcrumbItem[] = [
     {
@@ -138,19 +138,20 @@ export default function Show() {
           <TabsContent value="quizzes" className="pt-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold">All Quizzes ({subject.quizzes.length})</h2>
-              <Button asChild>
-                <Link href={route('subjects.index', { subject_id: subject.id })}>
-                  <PlusCircle className="mr-2 h-4 w-4" />
-                  Create Quiz
-                </Link>
+              <Button onClick={() => setShowCreateQuizTitleDialog(true)}>
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Create Quiz
               </Button>
             </div>
 
-            <div className="grid grid-cols-1 gap-4">
+            <div className="my-8 grid grid-cols-1 gap-4">
               {subject.quizzes.map(quiz => (
                 <Card key={quiz.id} className="rounded-none bg-white py-4">
                   <CardContent className="p-0">
-                    <Link href={route('subjects.show', { id: quiz.id })} className="flex items-center p-4 transition-colors hover:bg-gray-50">
+                    <Link
+                      href={route('subjects.quizzes.quiz.show', { subject: subject.id, quiz: quiz.id })}
+                      className="flex items-center px-6 py-2 transition-colors hover:bg-gray-50"
+                    >
                       <div className="mr-4 rounded-full bg-blue-50 p-3">
                         <FileText className="h-6 w-6 text-blue-500" />
                       </div>
@@ -173,11 +174,9 @@ export default function Show() {
                   <FileText className="mx-auto mb-4 h-12 w-12 text-gray-300" />
                   <h3 className="mb-1 text-lg font-medium text-gray-900">No quizzes yet</h3>
                   <p className="mb-6 text-gray-500">Get started by creating your first quiz</p>
-                  <Button asChild>
-                    <Link href={route('quizzes.create', { subject_id: subject.id })}>
-                      <PlusCircle className="mr-2 h-4 w-4" />
-                      Create Quiz
-                    </Link>
+                  <Button onClick={() => setShowCreateQuizTitleDialog(true)}>
+                    <PlusCircle className="mr-2 h-4 w-4" />
+                    Create Quiz
                   </Button>
                 </div>
               )}
@@ -185,6 +184,12 @@ export default function Show() {
           </TabsContent>
         </Tabs>
       </div>
+      <CreateQuizTitleDialog
+        open={showCreateQuizTitleDialog}
+        onOpenChange={setShowCreateQuizTitleDialog}
+        subjectId={subject.id}
+        subjectTitle={subject.title}
+      />
     </AppLayout>
   );
 }

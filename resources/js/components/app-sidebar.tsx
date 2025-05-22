@@ -3,7 +3,7 @@ import { NavUser } from '@/components/nav-user';
 import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/components/ui/sidebar';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { ChartNetwork, Hash, History, Settings2, Star } from 'lucide-react';
+import { Archive, ChartNetwork, Hash, History, Settings2, Star } from 'lucide-react';
 import AppLogo from './app-logo';
 import NavActions from './nav-actions';
 
@@ -17,6 +17,11 @@ const mainNavItems: NavItem[] = [
     title: 'Favorites',
     href: '/favorites',
     icon: Star,
+  },
+  {
+    title: 'Archived',
+    href: '/archives',
+    icon: Archive,
   },
   {
     title: 'Recent Quizzes',

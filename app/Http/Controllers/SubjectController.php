@@ -6,6 +6,7 @@ use App\Models\Quiz;
 use App\Models\Subject;
 use Carbon\CarbonInterval;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 
@@ -14,16 +15,18 @@ class SubjectController extends Controller
 
     public function index()
     {
-        $subjects = Subject::paginate()->through(function ($subject) {
-            return [
-                'id' => $subject->id,
-                'title' => $subject->title,
-                'description' => $subject->description,
-                'image' => $subject->image ? Storage::url($subject->image) : null,
-                'created_at' => $subject->created_at->diffForHumans(),
-                'updated_at' => $subject->updated_at->diffForHumans(),
-            ];
-        });
+        $subjects = Subject::where('user_id', Auth::id())
+            ->paginate()
+            ->through(function ($subject) {
+                return [
+                    'id' => $subject->id,
+                    'title' => $subject->title,
+                    'description' => $subject->description,
+                    'image' => $subject->image ? Storage::url($subject->image) : null,
+                    'created_at' => $subject->created_at->diffForHumans(),
+                    'updated_at' => $subject->updated_at->diffForHumans(),
+                ];
+            });
 
         return Inertia::render('subjects/index', [
             'subjects' => $subjects,
@@ -82,6 +85,7 @@ class SubjectController extends Controller
 
         $subject = new Subject();
         $subject->title = $validated['title'];
+        $subject->user_id = Auth::id();
         $subject->description = $validated['description'] ?? null;
 
         if ($request->hasFile('image')) {

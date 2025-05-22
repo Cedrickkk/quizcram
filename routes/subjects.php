@@ -13,7 +13,13 @@ Route::prefix('/subjects')->group(function () {
 
   Route::get('/{subject}/quizzes', [SubjectController::class, 'quizzes'])->name('subjects.quizzes');
 
-  Route::post('/{subject}/quizzes', [QuizController::class, 'store'])->name('subjects.quizzes.create');
+  Route::get('/{subject}/quizzes', [QuizController::class, 'create'])->name('subjects.quizzes.create');
+
+  Route::post('/{subject}/quizzes/create-title', [QuizController::class, 'createTitle'])->name('subjects.quizzes.create-title');
+
+  Route::post('/{subject}/quizzes', [QuizController::class, 'store'])->name('subjects.quizzes.store');
+
+  Route::get('/{subject}/quizzes/{quiz}', [QuizController::class, 'show'])->name('subjects.quizzes.quiz.show');
 
   Route::post('/archive/{subject}', [SubjectController::class, 'archive'])->name('subjects.archive');
 });

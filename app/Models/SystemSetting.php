@@ -10,6 +10,7 @@ class SystemSetting extends Model
     use HasFactory;
     protected $fillable = [
         'name',
+        'user_id',
         'question_order',
         'display_format',
         'show_question_number',
@@ -19,5 +20,14 @@ class SystemSetting extends Model
         'passing_threshold',
         'time_duration',
         'max_attempts',
+    ];
+
+    protected $casts = [
+        'show_question_number' => 'boolean',
+        'visible_timer' => 'boolean',
+        'question_required' => 'boolean',
+        'passing_threshold' => 'integer',
+        'time_duration' => 'integer',
+        'max_attempts' => 'integer',
     ];
 }
