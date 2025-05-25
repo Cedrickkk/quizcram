@@ -34,7 +34,7 @@ class QuizController extends Controller
         return Inertia::render('quizzes/create', [
             'quiz' => $quiz->load([
                 'questions' => function ($query) {
-                    $query->with('answers')->orderBy('order_number');
+                    $query->with('options')->orderBy('order_number');
                 },
                 'settings',
                 'subject',
@@ -50,11 +50,13 @@ class QuizController extends Controller
 
         $quiz->load([
             'questions' => function ($query) {
-                $query->with('answers')->orderBy('order_number');
+                $query->with('options')->orderBy('order_number');
             },
             'settings',
             'subject',
         ]);
+
+
 
         $systemSettings = SystemSetting::where('user_id', Auth::id())->first();
 

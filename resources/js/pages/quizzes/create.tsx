@@ -2,8 +2,9 @@ import AppLayout from '@/layouts/app-layout';
 import QuizCreateQuestionLayout from '@/layouts/quizzes/create/layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, usePage } from '@inertiajs/react';
+import { useState } from 'react';
 import Question from './question';
-import { Quiz } from './show';
+import { Quiz, Question as TQuestion } from './show';
 
 type PageProps = {
   quiz: Quiz;
@@ -11,6 +12,7 @@ type PageProps = {
 
 export default function Create() {
   const { quiz } = usePage<PageProps>().props;
+  const [questions, setQuestions] = useState<TQuestion[]>();
 
   const breadcrumbs: BreadcrumbItem[] = [
     {

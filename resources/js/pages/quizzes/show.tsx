@@ -5,13 +5,25 @@ import { Head, Link, usePage } from '@inertiajs/react';
 import { FileText, PlusCircle, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { Subject } from '../subjects/details';
+import Question from './question';
+import Questions from './questions';
 import QuizSettingsDialog, { QuizSettings } from './show-quiz-settings-dialog';
 
-type Question = {
+type QuestionOptions = {
+  id: number;
+  question_id: number;
+  text: string;
+  is_correct: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type Question = {
   id: number;
   quiz_id: number;
   text: string;
   type: 'multiple_choice' | 'true_or_false' | 'short_answer';
+  options: QuestionOptions[];
   points: number;
   order_number: number;
   image: string | null;
@@ -71,6 +83,8 @@ export default function Show() {
             <Settings className="h-3.5" />
           </Button>
         </div>
+
+        {quiz.questions.length && <Questions questions={quiz.questions} />}
 
         {quiz.questions.length === 0 && (
           <div className="py-12 text-center">
