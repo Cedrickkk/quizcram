@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\HumanReadableTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -15,6 +16,11 @@ class Quiz extends Model
         'time_duration',
         'max_attempts',
         'is_archived',
+    ];
+
+    protected $casts = [
+        'created_at' => HumanReadableTime::class,
+        'updated_at' => HumanReadableTime::class,
     ];
 
     public function subject()

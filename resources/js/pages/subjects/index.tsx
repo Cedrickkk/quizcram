@@ -19,6 +19,7 @@ export type Subject = {
   image: string;
   created_at: string;
   updated_at: string;
+  total_quizzes: number;
 };
 
 type PageProps = {
@@ -145,7 +146,7 @@ export default function Subjects() {
                   <div className="text-sm text-gray-500">Edited {subject.updated_at}</div>
                   <div className="flex items-center gap-1.5">
                     <BookOpen className="h-3.5 w-3.5 text-gray-500" />
-                    <span className="text-sm">{subject.id} Quizzes</span>
+                    <span className="text-sm">{subject.total_quizzes} Quizzes</span>
                   </div>
                 </CardFooter>
               </Card>

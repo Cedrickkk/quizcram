@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Casts\HumanReadableTime;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -13,6 +14,11 @@ class Subject extends Model
         'name',
         'image',
         'description',
+    ];
+
+    protected $casts = [
+        'created_at' => HumanReadableTime::class,
+        'updated_at' => HumanReadableTime::class,
     ];
 
     public function quizzes()

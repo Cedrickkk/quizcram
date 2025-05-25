@@ -13,10 +13,9 @@ use Inertia\Inertia;
 
 class QuizController extends Controller
 {
-
-    public function create(Subject $subject)
+    public function create(Subject $subject, Quiz $quiz)
     {
-        $systemSettings = SystemSetting::where('user_id', Auth::id())->first();
+        $systemSettings = SystemSetting::where('user_id', Auth::id());
 
         if (!$systemSettings) {
             $systemSettings = new SystemSetting([
@@ -33,8 +32,13 @@ class QuizController extends Controller
         }
 
         return Inertia::render('quizzes/create', [
-            'subject' => $subject,
-            'systemSettings' => $systemSettings,
+            'quiz' => $quiz->load([
+                'questions' => function ($query) {
+                    $query->with('answers')->orderBy('order_number');
+                },
+                'settings',
+                'subject',
+            ]),
         ]);
     }
 
@@ -68,14 +72,8 @@ class QuizController extends Controller
             ]);
         }
 
-        $effectiveSettings = $this->getEffectiveSettings($quiz->settings, $systemSettings);
-
         return Inertia::render('quizzes/show', [
             'quiz' => $quiz,
-            'subject' => $subject,
-            'questions' => $quiz->questions,
-            'effectiveSettings' => $effectiveSettings,
-            'userCanEdit' => $quiz->user_id === Auth::id() || Auth::user()->can('edit', $quiz),
         ]);
     }
 

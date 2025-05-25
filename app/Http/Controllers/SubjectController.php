@@ -23,8 +23,9 @@ class SubjectController extends Controller
                     'title' => $subject->title,
                     'description' => $subject->description,
                     'image' => $subject->image ? Storage::url($subject->image) : null,
-                    'created_at' => $subject->created_at->diffForHumans(),
-                    'updated_at' => $subject->updated_at->diffForHumans(),
+                    'created_at' => $subject->created_at,
+                    'updated_at' => $subject->updated_at,
+                    'total_quizzes' => $subject->quizzes->count(),
                 ];
             });
 
@@ -41,14 +42,14 @@ class SubjectController extends Controller
                 ->orderBy('created_at', 'desc');
         }])->findOrFail($subject->id);
 
-        return Inertia::render('subjects/show', [
+        return Inertia::render('subjects/details', [
             'subject' => [
                 'id' => $subject->id,
                 'title' => $subject->title,
                 'description' => $subject->description,
                 'image' => $subject->image ? Storage::url($subject->image) : null,
-                'created_at' => $subject->created_at->diffForHumans(),
-                'updated_at' => $subject->updated_at->diffForHumans(),
+                'created_at' => $subject->created_at,
+                'updated_at' => $subject->updated_at,
                 'total_quizzes' => $subject->quizzes->count(),
                 'avg_duration' =>        CarbonInterval::seconds($subject->quizzes->avg('time_duration') ?? 0)->cascade()->forHumans([
                     'parts' => 1,
@@ -97,7 +98,24 @@ class SubjectController extends Controller
     }
 
 
-    public function quizzes() {}
+    public function quizzes(Subject $subject)
+    {
+        return Inertia::render('subjects/quizzes', [
+            'subject' => $subject,
+            'quizzes' => $subject->quizzes->map(function ($quiz) {
+                $totalQuestions = $quiz->questions()->count();
+                return [
+                    'id' => $quiz->id,
+                    'title' => $quiz->title,
+                    'time_duration' => CarbonInterval::seconds($quiz->time_duration)->cascade()->forHumans([
+                        'parts' => 1,
+                        'short' => true,
+                    ]),
+                    'total_questions' => $totalQuestions,
+                ];
+            }),
+        ]);
+    }
 
 
     public function archive(Request $request)
