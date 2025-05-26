@@ -17,9 +17,8 @@ export default function Questions({ questions }: QuestionsProps) {
   return (
     <>
       {questions.map(question => {
-        console.log(question.options);
         return (
-          <div className="mb-6">
+          <div className="mb-6" key={question.id}>
             <div className="flex flex-row items-center justify-between border-b bg-gray-50 px-4 py-3">
               <div className="flex items-center gap-2">
                 <Select value={question.type}>

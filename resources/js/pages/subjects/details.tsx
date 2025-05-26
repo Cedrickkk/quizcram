@@ -20,6 +20,7 @@ export interface Subject {
   image: string | null;
   created_at: string;
   updated_at: string;
+  is_favorited: boolean;
   quizzes: Quiz[];
   total_quizzes: number;
   avg_duration: number;

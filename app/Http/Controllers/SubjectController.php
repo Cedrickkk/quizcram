@@ -51,6 +51,7 @@ class SubjectController extends Controller
                 'created_at' => $subject->created_at,
                 'updated_at' => $subject->updated_at,
                 'total_quizzes' => $subject->quizzes->count(),
+                'is_favorited' => $subject->is_favorited,
                 'avg_duration' =>        CarbonInterval::seconds($subject->quizzes->avg('time_duration') ?? 0)->cascade()->forHumans([
                     'parts' => 1,
                     'short' => true,

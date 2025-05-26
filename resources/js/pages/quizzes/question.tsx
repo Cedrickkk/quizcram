@@ -9,12 +9,6 @@ import { Switch } from '@/components/ui/switch';
 import { CircleDot, Pencil, PlusCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 
-type Choice = {
-  id: string;
-  text: string;
-  isCorrect: boolean;
-};
-
 type QuestionProps = {
   initialText?: string;
   initialType?: 'multiple_choice' | 'true_or_false' | 'short_answer';

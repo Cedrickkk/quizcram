@@ -22,7 +22,8 @@ class SubjectFactory extends Factory
             'user_id' => User::factory(),
             'title' => $this->faker->sentence(3),
             'description' => $this->faker->paragraphs(1, true),
-            'image' => null, // Images are harder to fake, leave as null by default
+            'image' => null,
+            'is_favorited' => false,
             'created_at' => $this->faker->dateTimeBetween('-6 months', '-1 week'),
             'updated_at' => $this->faker->dateTimeBetween('-1 week', 'now'),
         ];

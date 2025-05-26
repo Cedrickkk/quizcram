@@ -1,8 +1,7 @@
 import { Button } from '@/components/ui/button';
 import { Subject } from '@/pages/subjects/details';
-import { Link, usePage } from '@inertiajs/react';
+import { Link, useForm, usePage } from '@inertiajs/react';
 import { Star } from 'lucide-react';
-import { useState } from 'react';
 
 type LayoutProps = {
   subject: Subject;
@@ -10,12 +9,21 @@ type LayoutProps = {
 };
 
 export default function SubjectLayout({ children, subject }: LayoutProps) {
-  const [favorited, setFavorited] = useState(false);
   const { url } = usePage();
 
-  // Check if current URL matches the quiz route
+  const { post, processing } = useForm({
+    subject_id: subject.id,
+  });
+
   const isQuizzesActive = url.includes(`/subjects/${subject.id}/quizzes`);
   const isDetailsActive = !isQuizzesActive && url.includes(`/subjects/${subject.id}`);
+
+  const toggleFavorite = () => {
+    post(route('favorite.toggle', subject.id), {
+      preserveScroll: true,
+      showProgress: false,
+    });
+  };
 
   return (
     <div className="flex-1 px-6">
@@ -51,9 +59,9 @@ export default function SubjectLayout({ children, subject }: LayoutProps) {
             </Link>
           </Button>
         </div>
-        <Button variant="ghost" className="flex w-fit items-center gap-2" onClick={() => setFavorited(!favorited)}>
-          <Star className={`h-4 w-4 ${favorited ? 'fill-yellow-400 text-yellow-400' : ''}`} />
-          {favorited ? 'Favorited' : 'Favorite'}
+        <Button variant="ghost" className="flex w-fit items-center gap-2" onClick={toggleFavorite} disabled={processing}>
+          <Star className={`h-4 w-4 ${subject.is_favorited ? 'fill-yellow-400 text-yellow-400' : ''}`} />
+          {subject.is_favorited ? 'Favorited' : 'Favorite'}
         </Button>
       </div>
       <div>{children}</div>

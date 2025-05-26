@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\QuestionOption;
 use App\Models\Quiz;
 use App\Models\QuizSetting;
 use App\Models\Subject;
@@ -81,7 +82,8 @@ class QuizController extends Controller
 
     public function store(Request $request)
     {
-        // Validate main quiz data
+        dd($request);
+
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'subject_id' => 'required|exists:subjects,id',
@@ -92,11 +94,9 @@ class QuizController extends Controller
             'questions' => 'required|array|min:1',
         ]);
 
-        // Start a database transaction
         DB::beginTransaction();
 
         try {
-            // Create the quiz
             $quiz = Quiz::create([
                 'title' => $validated['title'],
                 'subject_id' => $validated['subject_id'],
@@ -104,7 +104,6 @@ class QuizController extends Controller
                 'max_attempts' => $validated['max_attempts'],
             ]);
 
-            // Create quiz settings if custom settings are enabled
             if ($validated['override_settings']) {
                 $quiz->quizSettings()->create([
                     'use_default_settings' => false,
@@ -117,13 +116,11 @@ class QuizController extends Controller
                     'passing_threshold' => $validated['settings']['passing_threshold'],
                 ]);
             } else {
-                // Use default settings
                 $quiz->quizSettings()->create([
                     'use_default_settings' => true,
                 ]);
             }
 
-            // Process questions
             foreach ($request->questions as $index => $questionData) {
                 $question = $quiz->questions()->create([
                     'text' => $questionData['text'],
@@ -132,7 +129,6 @@ class QuizController extends Controller
                     'order_number' => $index + 1,
                 ]);
 
-                // Process answers
                 foreach ($questionData['answers'] as $answerIndex => $answerData) {
                     $question->answers()->create([
                         'text' => $answerData['text'],
@@ -141,14 +137,9 @@ class QuizController extends Controller
                     ]);
                 }
             }
-
             DB::commit();
-
-            return redirect()->route('quizzes.show', $quiz->id)
-                ->with('success', 'Quiz created successfully');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Failed to create quiz: ' . $e->getMessage()]);
         }
     }
 
@@ -162,6 +153,7 @@ class QuizController extends Controller
         $quiz = Quiz::create([
             'subject_id' => $validated['subject_id'],
             'title' => $validated['title'],
+            'time_duration' => 900,
         ]);
 
         QuizSetting::create([
@@ -200,4 +192,96 @@ class QuizController extends Controller
             'passing_threshold' => $quizSettings->passing_threshold ?? $systemSettings->passing_threshold,
         ];
     }
+
+    public function saveQuestions(Request $request, Subject $subject, Quiz $quiz)
+    {
+        // Validate incoming request
+        $validated = $request->validate([
+            'questions' => 'required|array',
+            'questions.*.text' => 'required|string',
+            'questions.*.type' => 'required|string|in:multiple_choice,true_or_false,short_answer',
+            'questions.*.points' => 'required|integer|min:1',
+            'questions.*.required' => 'required|boolean',
+            'questions.*.timeEstimation' => 'nullable|integer|min:0',
+            'questions.*.orderNumber' => 'required|integer|min:1',
+            'questions.*.randomizeOrder' => 'nullable|boolean',
+            'questions.*.choices' => 'required|array',
+            'questions.*.choices.*.text' => 'required|string',
+            'questions.*.choices.*.isCorrect' => 'required|boolean',
+            'questions.*.choices.*.orderNumber' => 'required|integer|min:1',
+        ]);
+
+        // Ensure the quiz belongs to the subject
+        if ($quiz->subject_id !== $subject->id) {
+            return back()->with(['message' => 'Quiz does not belong to this subject'], 403);
+        }
+
+        // Start a database transaction
+        DB::beginTransaction();
+
+        try {
+            // First, remove all existing questions and their options
+            // This approach replaces all questions rather than trying to update existing ones
+            $existingQuestionIds = $quiz->questions()->pluck('id');
+
+            // Delete all existing question options
+            QuestionOption::whereIn('question_id', $existingQuestionIds)->delete();
+
+            // Delete all existing questions
+            $quiz->questions()->delete();
+
+            // Create new questions from the request
+            foreach ($validated['questions'] as $index => $questionData) {
+                // Create the question
+                $question = $quiz->questions()->create([
+                    'quiz_id' => $quiz->id,
+                    'text' => $questionData['text'],
+                    'type' => $questionData['type'],
+                    'points' => $questionData['points'],
+                    'required' => $questionData['required'],
+                    'time_estimation' => $questionData['timeEstimation'],
+                    'order_number' => $index + 1, // Use the array index for consistent ordering
+                    'randomize_order' => $questionData['randomizeOrder'] ?? false,
+                ]);
+
+                // Create question options/answers
+                foreach ($questionData['choices'] as $choiceIndex => $choiceData) {
+                    $question->options()->create([
+                        'text' => $choiceData['text'],
+                        'is_correct' => $choiceData['isCorrect'],
+                        'order_number' => $choiceData['orderNumber'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+        } catch (\Exception $e) {
+            DB::rollBack();
+        }
+    }
+
+    public function showQuestions(Subject $subject, Quiz $quiz)
+    {
+        $quiz->load([
+            'questions' => function ($query) {
+                $query->with('options')->orderBy('order_number');
+            },
+            'settings',
+            'subject',
+        ]);
+
+        return Inertia::render('quizzes/edit-questions', [
+            'quiz' => $quiz->load([
+                'questions' => function ($query) {
+                    $query->with('options')->orderBy('order_number');
+                },
+                'settings',
+                'subject',
+            ]),
+        ]);
+    }
+
+    public function udpateQuestion() {}
+
+    public function deleteQuestion() {}
 }

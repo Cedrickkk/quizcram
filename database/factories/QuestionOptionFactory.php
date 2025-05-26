@@ -6,9 +6,9 @@ use App\Models\Question;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Answer>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\QuestionOptionFactory>
  */
-class AnswerFactory extends Factory
+class QuestionOptionFactory extends Factory
 {
     /**
      * Define the model's default state.

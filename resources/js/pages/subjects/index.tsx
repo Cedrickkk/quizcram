@@ -63,7 +63,7 @@ export default function Subjects() {
 
           <div className="mb-16 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <p className="text-sm text-black">
+              <p className="text-sm">
                 {filteredSubjects.length} {filteredSubjects.length === 1 ? 'item' : 'items'}
               </p>
               <Separator orientation="vertical" className="size-4 grow-0 text-black" />

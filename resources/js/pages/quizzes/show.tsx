@@ -1,12 +1,11 @@
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { FileText, PlusCircle, Settings } from 'lucide-react';
+import { BarChart4, Clock, FileText, Play, PlusCircle, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { Subject } from '../subjects/details';
-import Question from './question';
-import Questions from './questions';
 import QuizSettingsDialog, { QuizSettings } from './show-quiz-settings-dialog';
 
 type QuestionOptions = {
@@ -18,11 +17,13 @@ type QuestionOptions = {
   updated_at: string;
 };
 
+export type QuestionType = 'multiple_choice' | 'true_or_false' | 'short_answer';
+
 export type Question = {
   id: number;
   quiz_id: number;
   text: string;
-  type: 'multiple_choice' | 'true_or_false' | 'short_answer';
+  type: QuestionType;
   options: QuestionOptions[];
   points: number;
   order_number: number;
@@ -68,6 +69,8 @@ export default function Show() {
     },
   ];
 
+  console.log(quiz);
+
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
       <Head title={quiz.title} />
@@ -77,14 +80,63 @@ export default function Show() {
             <h1 className="text-2xl font-bold">{quiz.title}</h1>
             <p className="text-muted-foreground text-sm">Subject: {quiz.subject.title}</p>
             <p className="text-muted-foreground text-sm">Total questions: {quiz.questions.length ?? 0}</p>
-            <p className="text-muted-foreground text-sm">Last updated: {quiz.created_at}</p>
+            <p className="text-muted-foreground text-sm">Last updated: {quiz.updated_at}</p>
           </div>
-          <Button variant="ghost" onClick={() => setShowQuizSettingsDialog(true)}>
-            <Settings className="h-3.5" />
-          </Button>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setShowQuizSettingsDialog(true)}>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </Button>
+            {quiz.questions.length > 0 && (
+              <Button asChild variant="default">
+                <Link href={`/subjects/${quiz.subject_id}/quizzes/${quiz.id}/take`}>
+                  <Play className="mr-2 h-4 w-4" />
+                  Take Quiz
+                </Link>
+              </Button>
+            )}
+          </div>
         </div>
 
-        {quiz.questions.length && <Questions questions={quiz.questions} />}
+        <div className="space-y-6 p-6">
+          <div className="grid gap-4 md:grid-cols-3">
+            <Card className="rounded-xs">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Questions</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{quiz.questions.length}</div>
+                <p className="text-muted-foreground text-xs">
+                  {quiz.questions.length === 1 ? '1 question' : `${quiz.questions.length} questions`} in this quiz
+                </p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-xs">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Time Limit</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center">
+                  <Clock className="text-muted-foreground mr-2 h-4 w-4" />
+                  <div className="text-2xl font-bold">{quiz.time_duration ? `${quiz.time_duration} min` : 'No limit'}</div>
+                </div>
+                <p className="text-muted-foreground text-xs">{quiz.settings.visible_timer ? 'Timer visible' : 'Timer hidden'}</p>
+              </CardContent>
+            </Card>
+            <Card className="rounded-xs">
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Passing Score</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex items-center">
+                  <BarChart4 className="text-muted-foreground mr-2 h-4 w-4" />
+                  <div className="text-2xl font-bold">{quiz.settings.passing_threshold || 70}%</div>
+                </div>
+                <p className="text-muted-foreground text-xs">Required to pass this quiz</p>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
 
         {quiz.questions.length === 0 && (
           <div className="py-12 text-center">
@@ -100,7 +152,7 @@ export default function Show() {
           </div>
         )}
       </div>
-      <QuizSettingsDialog open={showQuizSettingsDialog} onOpenChange={setShowQuizSettingsDialog} />
+      <QuizSettingsDialog settings={quiz.settings} open={showQuizSettingsDialog} onOpenChange={setShowQuizSettingsDialog} />
     </AppLayout>
   );
 }

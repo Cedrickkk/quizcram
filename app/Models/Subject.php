@@ -14,6 +14,7 @@ class Subject extends Model
         'name',
         'image',
         'description',
+        'is_favorited',
     ];
 
     protected $casts = [

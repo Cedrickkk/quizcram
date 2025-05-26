@@ -2,7 +2,7 @@
 
 namespace Database\Factories;
 
-use App\Models\Answer;
+use App\Models\QuestionOption;
 use App\Models\Quiz;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
@@ -39,7 +39,7 @@ class QuestionFactory extends Factory
             if ($question->type === 'multiple_choice') {
                 $correctAnswerIndex = $this->faker->numberBetween(0, 3);
                 for ($i = 0; $i < 4; $i++) {
-                    Answer::factory()->create([
+                    QuestionOption::factory()->create([
                         'question_id' => $question->id,
                         'text' => $this->faker->sentence(3),
                         'is_correct' => ($i === $correctAnswerIndex),
@@ -47,18 +47,18 @@ class QuestionFactory extends Factory
                 }
             } else if ($question->type === 'true_false') {
                 $isTrue = $this->faker->boolean;
-                Answer::factory()->create([
+                QuestionOption::factory()->create([
                     'question_id' => $question->id,
                     'text' => 'True',
                     'is_correct' => $isTrue,
                 ]);
-                Answer::factory()->create([
+                QuestionOption::factory()->create([
                     'question_id' => $question->id,
                     'text' => 'False',
                     'is_correct' => !$isTrue,
                 ]);
             } else if ($question->type === 'short_answer') {
-                Answer::factory()->create([
+                QuestionOption::factory()->create([
                     'question_id' => $question->id,
                     'text' => $this->faker->sentence(2),
                     'is_correct' => true,

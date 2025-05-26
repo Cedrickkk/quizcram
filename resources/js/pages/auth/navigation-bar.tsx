@@ -18,7 +18,8 @@ export default function AuthAuthNavigationBar() {
     <header className="relative w-full bg-white shadow-sm">
       <div className="container mx-auto flex items-center justify-between p-4">
         <div className="flex items-center">
-          <Link href={route('home')} className="text-primary text-xl font-bold">
+          <Link href={route('home')} className="text-primary -gap-1 flex items-center text-xl font-bold">
+            <img src="quizcram.png" alt="" className="size-14" />
             QuizCram
           </Link>
         </div>

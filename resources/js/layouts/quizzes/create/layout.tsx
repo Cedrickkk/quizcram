@@ -18,7 +18,6 @@ export default function QuizCreateQuestionLayout({ quiz, children }: QuizCreateQ
         <div>
           <h1 className="text-2xl font-bold">{quiz.title}</h1>
           <p className="text-muted-foreground text-sm">Subject: {quiz.subject.title}</p>
-          <p className="text-muted-foreground text-sm">Total questions: {quiz.questions.length ?? 0}</p>
           <p className="text-muted-foreground text-sm">Last updated: {quiz.created_at}</p>
         </div>
         <Button variant="ghost" onClick={() => setShowQuizSettingsDialog(true)}>
@@ -26,7 +25,7 @@ export default function QuizCreateQuestionLayout({ quiz, children }: QuizCreateQ
         </Button>
       </div>
       <div className="container px-6">{children}</div>
-      <QuizSettingsDialog open={showQuizSettingsDialog} onOpenChange={setShowQuizSettingsDialog} />
+      <QuizSettingsDialog settings={quiz.settings} open={showQuizSettingsDialog} onOpenChange={setShowQuizSettingsDialog} />
     </div>
   );
 }
