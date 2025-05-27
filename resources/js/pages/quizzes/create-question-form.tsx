@@ -12,9 +12,9 @@ import { QuestionType } from './show';
 type Choice = {
   id: number;
   text: string;
-  questionId: number;
-  isCorrect: boolean;
-  orderNumber: number;
+  question_id: number;
+  is_correct: boolean;
+  order_number: number;
 };
 
 type Question = {
@@ -23,9 +23,9 @@ type Question = {
   choices: Choice[];
   points: number;
   required: boolean;
-  orderNumber: number;
-  timeEstimation: number;
-  randomizeOrder?: boolean;
+  order_number: number;
+  time_estimation: number;
+  order: 'keep_choices_in_current_order' | 'randomize';
   image?: File | null;
 };
 
@@ -51,8 +51,6 @@ export default function CreateQuestionForm({
   hideSaveButton,
   saveButtonText,
 }: CreateQuestionFormProps) {
-  // Handlers that update the question through the parent's onQuestionChange
-
   const handleQuestionTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onQuestionChange({
       ...question,
@@ -65,17 +63,17 @@ export default function CreateQuestionForm({
 
     if (type === 'true_or_false') {
       updatedChoices = [
-        { id: 1, text: 'True', isCorrect: true, orderNumber: 1, questionId: question.orderNumber },
-        { id: 2, text: 'False', isCorrect: false, orderNumber: 2, questionId: question.orderNumber },
+        { id: 1, text: 'True', is_correct: true, order_number: 1, question_id: question.order_number },
+        { id: 2, text: 'False', is_correct: false, order_number: 2, question_id: question.order_number },
       ];
     } else if (type === 'short_answer') {
-      updatedChoices = [{ id: 1, text: '', isCorrect: true, orderNumber: 1, questionId: question.orderNumber }];
+      updatedChoices = [{ id: 1, text: '', is_correct: true, order_number: 1, question_id: question.order_number }];
     } else if (type === 'multiple_choice' && question.type !== 'multiple_choice') {
       updatedChoices = [
-        { id: 1, text: '', isCorrect: true, orderNumber: 1, questionId: question.orderNumber },
-        { id: 2, text: '', isCorrect: false, orderNumber: 2, questionId: question.orderNumber },
-        { id: 3, text: '', isCorrect: false, orderNumber: 3, questionId: question.orderNumber },
-        { id: 4, text: '', isCorrect: false, orderNumber: 4, questionId: question.orderNumber },
+        { id: 1, text: '', is_correct: true, order_number: 1, question_id: question.order_number },
+        { id: 2, text: '', is_correct: false, order_number: 2, question_id: question.order_number },
+        { id: 3, text: '', is_correct: false, order_number: 3, question_id: question.order_number },
+        { id: 4, text: '', is_correct: false, order_number: 4, question_id: question.order_number },
       ];
     }
 
@@ -105,14 +103,14 @@ export default function CreateQuestionForm({
       ...question,
       choices: question.choices.map(choice => ({
         ...choice,
-        isCorrect: choice.id === parseInt(choiceId),
+        is_correct: choice.id === parseInt(choiceId),
       })),
     });
   };
 
   const handleAddChoice = () => {
     const nextId = Math.max(...question.choices.map(c => c.id)) + 1;
-    const nextOrderNumber = Math.max(...question.choices.map(c => c.orderNumber)) + 1;
+    const nextOrderNumber = Math.max(...question.choices.map(c => c.order_number)) + 1;
 
     onQuestionChange({
       ...question,
@@ -121,9 +119,9 @@ export default function CreateQuestionForm({
         {
           id: nextId,
           text: '',
-          isCorrect: false,
-          orderNumber: nextOrderNumber,
-          questionId: question.orderNumber,
+          is_correct: false,
+          order_number: nextOrderNumber,
+          question_id: question.order_number,
         },
       ],
     });
@@ -136,9 +134,9 @@ export default function CreateQuestionForm({
 
     const updatedChoices = question.choices.filter(choice => choice.id !== choiceId);
 
-    const hasCorrectChoice = updatedChoices.some(choice => choice.isCorrect);
+    const hasCorrectChoice = updatedChoices.some(choice => choice.is_correct);
     if (!hasCorrectChoice && updatedChoices.length > 0) {
-      updatedChoices[0].isCorrect = true;
+      updatedChoices[0].is_correct = true;
     }
 
     onQuestionChange({
@@ -156,23 +154,22 @@ export default function CreateQuestionForm({
   };
 
   const handleTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const time = parseInt(e.target.value) || 0;
+    const time = parseInt(e.target.value) || 1;
     onQuestionChange({
       ...question,
-      timeEstimation: time,
+      time_estimation: time,
     });
   };
 
-  const handleRandomizeOrderChange = (value: string) => {
+  const handleRandomizeOrderChange = (value: 'keep_choices_in_current_order' | 'randomize') => {
     onQuestionChange({
       ...question,
-      randomizeOrder: value === 'randomize',
+      order: value,
     });
   };
 
   return (
     <div className="mb-6">
-      {/* Question Header */}
       <div className="flex flex-row items-center justify-between border-b bg-gray-50 px-4 py-3">
         <div className="flex items-center gap-2">
           <Select value={question.type} onValueChange={(value: QuestionType) => handleQuestionTypeChange(value)}>
@@ -214,7 +211,6 @@ export default function CreateQuestionForm({
         </div>
       </div>
 
-      {/* Question Content */}
       <CardContent className="p-4">
         <div className="mb-6">
           <Label htmlFor="question-text" className="sr-only">
@@ -229,21 +225,20 @@ export default function CreateQuestionForm({
           />
         </div>
 
-        {/* Multiple Choice Options */}
         {question.type === 'multiple_choice' && (
           <div className="mb-6 space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium text-red-500">Choices *</Label>
             </div>
 
-            <RadioGroup value={question.choices.find(c => c.isCorrect)?.id.toString() || ''} onValueChange={handleCorrectAnswerChange}>
+            <RadioGroup value={String(question.choices.find(c => c.is_correct)?.id)} onValueChange={handleCorrectAnswerChange}>
               {question.choices.map(choice => (
                 <div key={choice.id} className="group flex items-center gap-2">
                   <RadioGroupItem value={choice.id.toString()} id={`choice-${choice.id}`} />
                   <Input
                     value={choice.text}
                     onChange={e => handleChoiceTextChange(choice.id, e.target.value)}
-                    placeholder={`Choice ${choice.orderNumber}`}
+                    placeholder={`Choice ${choice.order_number}`}
                     className="flex-1"
                   />
                   <Button
@@ -264,14 +259,13 @@ export default function CreateQuestionForm({
           </div>
         )}
 
-        {/* True/False Options */}
         {question.type === 'true_or_false' && (
           <div className="mb-6 space-y-2">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Choices</Label>
             </div>
 
-            <RadioGroup value={question.choices.find(c => c.isCorrect)?.id.toString() || ''} onValueChange={handleCorrectAnswerChange}>
+            <RadioGroup value={question.choices.find(c => c.is_correct)?.id.toString()} onValueChange={handleCorrectAnswerChange}>
               {question.choices.map(choice => (
                 <div key={choice.id} className="flex items-center gap-2">
                   <RadioGroupItem value={choice.id.toString()} id={`tf-${choice.id}`} />
@@ -282,7 +276,6 @@ export default function CreateQuestionForm({
           </div>
         )}
 
-        {/* Short Answer */}
         {question.type === 'short_answer' && (
           <div className="mb-6">
             <div className="mb-2 flex items-center justify-between">
@@ -297,11 +290,10 @@ export default function CreateQuestionForm({
           </div>
         )}
 
-        {/* Bottom Settings */}
         <div className="grid grid-cols-3 gap-4 border-t pt-4">
           <div>
             <Label className="mb-1 block text-sm">Randomize Order</Label>
-            <Select value={question.randomizeOrder ? 'randomize' : 'keep_choices_in_current_order'} onValueChange={handleRandomizeOrderChange}>
+            <Select value={question.order} onValueChange={handleRandomizeOrderChange}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
@@ -315,7 +307,7 @@ export default function CreateQuestionForm({
           <div>
             <Label className="mb-1 block text-sm">Estimation Time</Label>
             <div className="flex items-center">
-              <Input type="number" className="w-16" value={question.timeEstimation} onChange={handleTimeChange} min={0} />
+              <Input type="number" className="w-16" value={question.time_estimation} onChange={handleTimeChange} min={0} />
               <span className="ml-2">Mins</span>
             </div>
           </div>
@@ -330,7 +322,6 @@ export default function CreateQuestionForm({
         </div>
       </CardContent>
 
-      {/* Action Buttons */}
       <div className="mt-4 flex justify-end gap-2">
         {showCancelButton && (
           <Button variant="outline" onClick={onCancel}>

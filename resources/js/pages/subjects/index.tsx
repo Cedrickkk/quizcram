@@ -38,6 +38,7 @@ export default function Subjects() {
   const [isArchiveDialogOpen, setIsArchiveDialogOpen] = useState(false);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
+  const [layout, setLayout] = useState<'card' | 'list'>('card');
   const { subjects } = usePage<PageProps>().props;
 
   const filteredSubjects = subjects.data.filter(subject => subject.title.toLowerCase().includes(searchTerm.toLowerCase()));
@@ -87,7 +88,7 @@ export default function Subjects() {
                 <div className="flex items-center gap-1">
                   <Tooltip delayDuration={1000}>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm">
+                      <Button variant={layout === 'card' ? 'default' : 'ghost'} size="sm" onClick={() => setLayout('card')}>
                         <Grid2x2 className="h-3.5 w-3.5" />
                       </Button>
                     </TooltipTrigger>
@@ -98,7 +99,7 @@ export default function Subjects() {
 
                   <Tooltip delayDuration={1000}>
                     <TooltipTrigger asChild>
-                      <Button variant="ghost" size="sm">
+                      <Button variant={layout === 'list' ? 'default' : 'ghost'} size="sm" onClick={() => setLayout('list')}>
                         <List className="h-3.5 w-3.5" />
                       </Button>
                     </TooltipTrigger>
@@ -111,51 +112,99 @@ export default function Subjects() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {filteredSubjects.map(subject => (
-              <Card key={subject.id} className="overflow-hidden rounded-sm">
-                <div className="relative">
-                  <img src={subject.image} alt={subject.title} className="h-40 w-full bg-no-repeat object-cover" />
-                  <div className="absolute top-0 right-0 p-1.5">
+          {layout === 'card' ? (
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {filteredSubjects.map(subject => (
+                <Card key={subject.id} className="overflow-hidden rounded-sm">
+                  <div className="relative">
+                    <img src={subject.image} alt={subject.title} className="h-40 w-full bg-no-repeat object-cover" />
+                    <div className="absolute top-0 right-0 p-1.5">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem>Edit</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem className="text-destructive">
+                            <button onClick={() => handleArchiveClick(subject)} className="w-full text-left">
+                              Archive
+                            </button>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
+                  </div>
+
+                  <CardHeader className="pb-2">
+                    <h3 className="text-lg font-semibold">
+                      <Link href={`/subjects/${subject.id}`} className="hover:underline">
+                        {subject.title}
+                      </Link>
+                    </h3>
+                  </CardHeader>
+
+                  <CardFooter className="flex items-center justify-between pt-0">
+                    <div className="text-sm text-gray-500">Edited {subject.updated_at}</div>
+                    <div className="flex items-center gap-1.5">
+                      <BookOpen className="h-3.5 w-3.5 text-gray-500" />
+                      <span className="text-sm">{subject.total_quizzes} Quizzes</span>
+                    </div>
+                  </CardFooter>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredSubjects.map(subject => (
+                <div key={subject.id} className="group flex items-center gap-4 rounded-lg border p-4 transition-colors hover:bg-gray-50">
+                  <div className="h-16 w-24 flex-shrink-0 overflow-hidden rounded">
+                    <img src={subject.image} alt={subject.title} className="h-full w-full object-cover" />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <h3 className="mb-1 text-lg font-semibold">
+                      <Link href={`/subjects/${subject.id}`} className="hover:underline">
+                        {subject.title}
+                      </Link>
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-gray-500">
+                      <span>Edited {subject.updated_at}</span>
+                      <div className="flex items-center gap-1">
+                        <BookOpen className="h-3.5 w-3.5" />
+                        <span>{subject.total_quizzes} Quizzes</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="opacity-0 transition-opacity group-hover:opacity-100">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm">
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full">
                           <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuItem>Edit</DropdownMenuItem>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem className="text-destructive" asChild>
-                          <DropdownMenuItem onSelect={() => handleArchiveClick(subject)}>Archive</DropdownMenuItem>
+                        <DropdownMenuItem className="text-destructive">
+                          <button onClick={() => handleArchiveClick(subject)} className="w-full text-left">
+                            Archive
+                          </button>
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
                 </div>
-
-                <CardHeader className="pb-2">
-                  <h3 className="text-lg font-semibold">
-                    <Link href={`/subjects/${subject.id}`} className="hover:underline">
-                      {subject.title}
-                    </Link>
-                  </h3>
-                </CardHeader>
-
-                <CardFooter className="flex items-center justify-between pt-0">
-                  <div className="text-sm text-gray-500">Edited {subject.updated_at}</div>
-                  <div className="flex items-center gap-1.5">
-                    <BookOpen className="h-3.5 w-3.5 text-gray-500" />
-                    <span className="text-sm">{subject.total_quizzes} Quizzes</span>
-                  </div>
-                </CardFooter>
-              </Card>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
+        <CreateSubjectDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
+        <ArchiveSubjectDialog subject={selectedSubject} open={isArchiveDialogOpen} onOpenChange={setIsArchiveDialogOpen} />
       </div>
-      <CreateSubjectDialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen} />
-      <ArchiveSubjectDialog subject={selectedSubject} open={isArchiveDialogOpen} onOpenChange={setIsArchiveDialogOpen} />
     </AppLayout>
   );
 }

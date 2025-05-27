@@ -11,13 +11,12 @@ import CreateQuestionForm from './create-question-form';
 import { QuestionType, Quiz } from './show';
 import QuizSettingsDialog from './show-quiz-settings-dialog';
 
-// Types can be moved to a separate file for reuse
 type Choice = {
   id: number;
   text: string;
-  questionId: number;
-  isCorrect: boolean;
-  orderNumber: number;
+  question_id: number;
+  is_correct: boolean;
+  order_number: number;
 };
 
 type NewQuestion = {
@@ -25,10 +24,10 @@ type NewQuestion = {
   type: QuestionType;
   choices: Choice[];
   points: number;
+  order: 'keep_choices_in_current_order' | 'randomize';
   required: boolean;
-  orderNumber: number;
-  timeEstimation: number;
-  randomizeOrder?: boolean;
+  order_number: number;
+  time_estimation: number;
   image?: File | null;
 };
 
@@ -60,24 +59,22 @@ export default function Create() {
       href: `/subjects/${quiz.subject.id}/quizzes/${quiz.id}`,
     },
   ];
-
   const [currentQuestion, setCurrentQuestion] = useState<NewQuestion>({
     text: '',
     image: null,
     type: 'multiple_choice',
     points: 1,
     required: true,
-    orderNumber: 1,
-    timeEstimation: 0,
-    randomizeOrder: false,
+    order_number: 1,
+    time_estimation: 0,
+    order: 'keep_choices_in_current_order',
     choices: [
-      { id: 1, text: '', isCorrect: true, orderNumber: 1, questionId: 1 },
-      { id: 2, text: '', isCorrect: false, orderNumber: 2, questionId: 1 },
-      { id: 3, text: '', isCorrect: false, orderNumber: 3, questionId: 1 },
-      { id: 4, text: '', isCorrect: false, orderNumber: 4, questionId: 1 },
+      { id: 1, text: '', is_correct: true, order_number: 1, question_id: 1 },
+      { id: 2, text: '', is_correct: false, order_number: 2, question_id: 1 },
+      { id: 3, text: '', is_correct: false, order_number: 3, question_id: 1 },
+      { id: 4, text: '', is_correct: false, order_number: 4, question_id: 1 },
     ],
   });
-
   const [questions, setQuestions] = useState<NewQuestion[]>([]);
   const [showQuizSettingsDialog, setShowQuizSettingsDialog] = useState(false);
 
@@ -150,21 +147,22 @@ export default function Create() {
     setQuestions(updatedQuestions);
     setData('questions', updatedQuestions);
 
-    const nextOrderNumber = currentQuestion.orderNumber + 1;
+    const nextOrderNumber = currentQuestion.order_number + 1;
+
     const newQuestion: NewQuestion = {
       text: '',
       image: null,
       type: 'multiple_choice',
       points: 1,
       required: true,
-      orderNumber: nextOrderNumber,
-      timeEstimation: 0,
-      randomizeOrder: false,
+      order_number: nextOrderNumber,
+      time_estimation: 0,
+      order: 'keep_choices_in_current_order',
       choices: [
-        { id: 1, text: '', isCorrect: true, orderNumber: 1, questionId: nextOrderNumber },
-        { id: 2, text: '', isCorrect: false, orderNumber: 2, questionId: nextOrderNumber },
-        { id: 3, text: '', isCorrect: false, orderNumber: 3, questionId: nextOrderNumber },
-        { id: 4, text: '', isCorrect: false, orderNumber: 4, questionId: nextOrderNumber },
+        { id: 1, text: '', is_correct: true, order_number: 1, question_id: nextOrderNumber },
+        { id: 2, text: '', is_correct: false, order_number: 2, question_id: nextOrderNumber },
+        { id: 3, text: '', is_correct: false, order_number: 3, question_id: nextOrderNumber },
+        { id: 4, text: '', is_correct: false, order_number: 4, question_id: nextOrderNumber },
       ],
     };
 
@@ -186,16 +184,11 @@ export default function Create() {
       <Head title="Create Quiz" />
       <QuizCreateQuestionLayout quiz={quiz}>
         <div className="relative container py-6">
-          {processing && (
-            <div className="bg-opacity-50 absolute inset-0 z-50 flex items-center justify-center bg-gray-200">
-              <p className="text-lg font-semibold text-gray-700">Processing...</p>
-            </div>
-          )}
           <div className="container py-6">
             {questions.map((question, index) => (
               <div key={index} className="mb-8">
                 <div className="mb-2 flex items-center justify-between">
-                  <h2 className="text-lg font-medium">Question {index + 1}</h2>
+                  <h2 className="text-lg font-medium">Question {quiz.questions.length}</h2>
                   <Button
                     variant="ghost"
                     color="destructive"
@@ -211,7 +204,6 @@ export default function Create() {
                   </Button>
                 </div>
 
-                {/* Render an editable form for each saved question */}
                 <CreateQuestionForm
                   question={question}
                   onQuestionChange={updatedQuestion => {
@@ -220,19 +212,16 @@ export default function Create() {
                     setQuestions(updatedQuestions);
                     setData('questions', updatedQuestions);
                   }}
-                  onSave={() => {
-                    // No need to save individual questions again
-                    // This is just to maintain the interface
-                  }}
+                  onSave={() => {}}
                   saveButtonText="Update Question"
-                  hideSaveButton={true} // Hide individual save buttons to avoid confusion
+                  hideSaveButton={true}
                 />
               </div>
             ))}
 
             {/* Current new question form */}
             <div className="mb-8">
-              <h2 className="mb-3 text-lg font-medium">Question {questions.length + 1}</h2>
+              <h2 className="mb-3 text-lg font-medium">Question {quiz.questions.length + 1}</h2>
               <CreateQuestionForm
                 question={currentQuestion}
                 onQuestionChange={setCurrentQuestion}
@@ -241,7 +230,6 @@ export default function Create() {
               />
             </div>
 
-            {/* Final save button */}
             <div className="mt-8 flex justify-between">
               <div>
                 {questions.length > 0 && (

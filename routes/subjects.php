@@ -25,6 +25,8 @@ Route::prefix('/subjects')->group(function () {
 
   Route::post('/{subject}/quizzes/{quiz}/questions', [QuizController::class, 'saveQuestions'])->name('subjects.quizzes.quiz.questions');
 
+  Route::get('/{subject}/quizzes/{quiz}/take', [QuizController::class, 'takeQuiz'])
+    ->name('subjects.quizzes.quiz.take');
 
   Route::patch('/{subject}/quizzes/{quiz}/questions/{question}', [QuizController::class, 'updateQuestion'])
     ->name('subjects.quizzes.quiz.questions.update');
@@ -33,4 +35,10 @@ Route::prefix('/subjects')->group(function () {
     ->name('subjects.quizzes.quiz.questions.delete');
 
   Route::post('/archive/{subject}', [SubjectController::class, 'archive'])->name('subjects.archive');
+
+  Route::post('/subjects/{subject}/quizzes/{quiz}/submit', [QuizController::class, 'submitQuiz'])
+    ->name('subjects.quizzes.submit');
+
+  Route::get('/subjects/{subject}/quizzes/{quiz}/results', [QuizController::class, 'quizResults'])
+    ->name('subjects.quizzes.results');
 });

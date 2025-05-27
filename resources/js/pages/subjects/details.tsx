@@ -9,6 +9,10 @@ export interface Quiz {
   title: string;
   total_questions: number;
   time_duration: number | null;
+  max_attempts: number;
+  user_attempt_count: number;
+  user_has_attempted: boolean;
+  attempts_remaining: number;
   created_at: string;
   updated_at: string;
 }
@@ -77,14 +81,12 @@ export default function Details() {
               </div>
             </div>
 
-            {/* Subject image */}
             {subject.image && (
               <div className="mb-8">
                 <img src={subject.image} alt={subject.title} className="h-96 w-full rounded-lg object-cover" />
               </div>
             )}
 
-            {/* Description */}
             <div className="mb-8">
               <h2 className="mb-4 text-xl font-semibold">Description</h2>
               <div className="prose max-w-none">

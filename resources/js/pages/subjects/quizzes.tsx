@@ -1,11 +1,10 @@
-import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import AppLayout from '@/layouts/app-layout';
 import SubjectLayout from '@/layouts/subjects/layout';
 import { BreadcrumbItem } from '@/types';
 import { Head, Link, usePage } from '@inertiajs/react';
-import { FileText, PlusCircle } from 'lucide-react';
+import { FileText, PlusCircle, Trash2 } from 'lucide-react';
 import { useState } from 'react';
 import CreateQuizTitleDialog from '../quizzes/create-quiz-title-dialog';
 import { Quiz, Subject } from './details';
@@ -36,7 +35,7 @@ export default function Quizzes() {
 
   return (
     <AppLayout breadcrumbs={breadcrumbs}>
-      <Head title="DETAILS" />
+      <Head title="Details" />
       <SubjectLayout subject={subject}>
         <div className="mb-6 flex items-center justify-between pt-6">
           <h2 className="text-xl font-semibold">All Quizzes ({subject.quizzes.length})</h2>
@@ -49,10 +48,10 @@ export default function Quizzes() {
         <div className="my-8 grid grid-cols-1 gap-4">
           {quizzes.map(quiz => (
             <Card key={quiz.id} className="rounded-none bg-white py-4">
-              <CardContent className="p-0">
+              <CardContent className="flex items-center justify-between">
                 <Link
                   href={route('subjects.quizzes.quiz.show', { subject: subject.id, quiz: quiz.id })}
-                  className="flex items-center px-6 py-2 transition-colors hover:bg-gray-50"
+                  className="flex w-[90%] items-center px-6 py-2 transition-colors"
                 >
                   <div className="mr-4 rounded-full bg-blue-50 p-3">
                     <FileText className="h-6 w-6 text-blue-500" />
@@ -63,10 +62,19 @@ export default function Quizzes() {
                       {quiz.total_questions} questions • {quiz.time_duration ? `${quiz.time_duration}` : 'No time limit'}
                     </p>
                   </div>
-                  <Badge variant="outline" className="ml-2">
-                    {quiz.created_at}
-                  </Badge>
                 </Link>
+
+                <div className="flex gap-2">
+                  <Link href={route('subjects.quizzes.quiz.take', { subject: subject.id, quiz: quiz.id })}>
+                    <Button variant="secondary" disabled={quiz.max_attempts !== null && quiz.attempts_remaining <= 0}>
+                      {quiz.user_has_attempted ? 'Retake' : 'Take'} Quiz
+                      {quiz.max_attempts !== null && ` (${quiz.attempts_remaining} left)`}
+                    </Button>
+                  </Link>
+                  <Button variant="ghost">
+                    <Trash2 className="text-destructive" />
+                  </Button>
+                </div>
               </CardContent>
             </Card>
           ))}

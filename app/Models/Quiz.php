@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Casts\HumanReadableTime;
+use App\Casts\TimeDuartionCast;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
@@ -19,6 +20,7 @@ class Quiz extends Model
     ];
 
     protected $casts = [
+        'time_duration' => TimeDuartionCast::class,
         'created_at' => HumanReadableTime::class,
         'updated_at' => HumanReadableTime::class,
     ];

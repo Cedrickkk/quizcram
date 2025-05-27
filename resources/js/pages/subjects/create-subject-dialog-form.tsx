@@ -61,7 +61,6 @@ export default function CreateSubjectDialog({ open, onOpenChange }: CreateSubjec
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Image Upload Area */}
           <div className="relative">
             <Input type="file" id="subject-image" className="sr-only" accept="image/*" onChange={handleImageChange} />
             <Label
@@ -80,7 +79,6 @@ export default function CreateSubjectDialog({ open, onOpenChange }: CreateSubjec
             {errors.image && <p className="text-destructive mt-1 text-sm">{errors.image}</p>}
           </div>
 
-          {/* Subject Title */}
           <div>
             <Label htmlFor="subject-title" className="text-base font-medium">
               Subject
@@ -95,7 +93,6 @@ export default function CreateSubjectDialog({ open, onOpenChange }: CreateSubjec
             {errors.title && <p className="text-destructive mt-1 text-sm">{errors.title}</p>}
           </div>
 
-          {/* Description */}
           <div>
             <Label htmlFor="subject-description" className="text-sm">
               Description
@@ -105,13 +102,12 @@ export default function CreateSubjectDialog({ open, onOpenChange }: CreateSubjec
               value={data.description}
               onChange={e => setData('description', e.target.value)}
               placeholder="Type description here"
-              className="mt-1 resize-none"
+              className="mt-1 w-full resize-none"
               rows={4}
             />
             {errors.description && <p className="text-destructive mt-1 text-sm">{errors.description}</p>}
           </div>
 
-          {/* Character Count */}
           <div className="flex justify-end">
             <span className="text-xs text-gray-500">{data.description?.length || 0}/300</span>
           </div>
